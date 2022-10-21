@@ -2,28 +2,85 @@ import math
 import control
 import numpy as np
 
-def check_valid_move(i1,j1,i2,j2, map):
-    if (i1 < 0 or i2 < 0 or i1 >= map.shape[0] or i2 >= map.shape[0]) or (j1 < 0 or j2 < 0 or j1 >= map.shape[1] or j2 >= map.shape[1]):
+
+def check_goal(i1,j1,i2,j2, map):
+    if i1 == i2 and j1 == j2 and map[i1,j1] == 10:
+        return True
+
+def swap(arr,pos1,pos2):
+    temp = arr[pos1]
+    arr[pos1] = arr[pos2]
+    arr[pos2] = temp
+    return arr
+
+def check_visited(check, visited):
+    if check in visited:
+        return True
+    if check[0] == check[2] and check[1] == check[3]:
         return False
-    return True
+    if check[0] == check[2]:
+        check = swap(check,1,3)
+        if check in visited:
+            return True
+    if check[1] == check[3]:
+        check = swap(check,0,2)
+        if check in visited:
+            return True
+    return False
 
-class blind_search:
-    def __init__(self,i1,j1,i2,j2, map):
-        self.i1 = i1
-        self.j1 = j1
-        self.i2 = i2
-        self.j2 = j2
-        self.map = map
-    def dfs(self):
-        visited = []
-        stack = []
-        check = check_valid_move(self.i1,self.j1,self.i2,self.j2,self.map)
-        #Di chuyển lên đến khi không còn đi được
-        while (check):
-            stack.append(np.array(self.i1,self.j1,self.i2,self.j2))
-            self.i1,self.j1,self.i2,self.j2 = control.UP(self.i1,self.j1,self.i2,self.j2)
-            check = check_valid_move(self.i1,self.j1,self.i2,self.j2,self.map)
-
+def dfs(i1,j1,i2,j2,map):
+    visited = []
+    stack = []
+    trace = []
+    #Thêm vào stack vị trí đầu tiên
+    stack.append([i1,j1,i2,j2,map])
+    while (len(stack) != 0):
+        item_pop = stack.pop()
+        visited.append(item_pop[:4])
+        i1,j1,i2,j2,map = item_pop
+        #Di chuyển lên (UP)
+        temp_map = map.copy()
+        x1,y1,x2,y2,new_map,valid = control.UP(i1,j1,i2,j2,temp_map)
+        if valid and (not check_visited([x1,y1,x2,y2], visited)):
+            stack.append([x1,y1,x2,y2,new_map])
+            if check_goal(x1,y1,x2,y2,new_map):
+                print(visited)
+                print(f"-->[{x1},{y1},{x2},{y2}]")
+                print("Success")
+                exit()
+        #Di chuyển xuống (DOWN)
+        temp_map = map.copy()
+        x1,y1,x2,y2,new_map,valid = control.DOWN(i1,j1,i2,j2,temp_map)
+        if valid and (not check_visited([x1,y1,x2,y2], visited)):
+            stack.append([x1,y1,x2,y2,new_map])
+            if check_goal(x1,y1,x2,y2,new_map):
+                print(visited)
+                print(f"-->[{x1},{y1},{x2},{y2}]")
+                print("Success")
+                exit()
+        #Di chuyển qua trái (LEFT)
+        temp_map = map.copy()
+        x1,y1,x2,y2,new_map,valid = control.LEFT(i1,j1,i2,j2,temp_map)
+        if valid and (not check_visited([x1,y1,x2,y2], visited)):
+            stack.append([x1,y1,x2,y2,new_map])
+            if check_goal(x1,y1,x2,y2,new_map):
+                print(visited)
+                print(f"-->[{x1},{y1},{x2},{y2}]")
+                print("Success")
+                exit()
+        #Di chuyển qua phải (RIGHT)
+        temp_map = map.copy()
+        x1,y1,x2,y2,new_map,valid = control.RIGHT(i1,j1,i2,j2,temp_map)
+        if valid and (not check_visited([x1,y1,x2,y2], visited)):
+            stack.append([x1,y1,x2,y2,new_map])
+            if check_goal(x1,y1,x2,y2,new_map):
+                print(visited)
+                print(f"-->[{x1},{y1},{x2},{y2}]")
+                print("Success")
+                exit()
+    print(visited)
+    print("Not found")
+    exit()
 
 
 
@@ -33,17 +90,19 @@ if __name__ == "__main__":
         [2,2,2,2,2,2,0,0,0,0],
         [2,2,2,2,2,2,2,2,2,0],
         [0,2,2,2,2,2,2,2,2,2],
-        [0,0,0,0,0,2,2,0,2,2],
+        [0,0,0,0,0,2,2,12,2,2],
         [0,0,0,0,0,0,2,2,2,0]
     ])
+    
     initBlock = [1,1,1,1]
     i1 = initBlock[0]
     j1 = initBlock[1]
     i2 = initBlock[2]
     j2 = initBlock[3]
-
     map[i1,j1] = map[i1,j1] - 1
     map[i2,j2] = map[i2,j2] - 1
 
-    i1,j1,i2,j2 = control.UP(i1,j1,i2,j2)
-    print(map)
+    # i1,j1,i2,j2,map,valid = control.DOWN(i1,j1,i2,j2,map)
+    # print(map, valid)
+
+    dfs(i1,j1,i2,j2,map)
