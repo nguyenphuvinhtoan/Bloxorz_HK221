@@ -1,4 +1,5 @@
 import math
+import queue
 import control
 import numpy as np
 
@@ -31,7 +32,6 @@ def check_visited(check, visited):
 def dfs(i1,j1,i2,j2,map):
     visited = []
     stack = []
-    trace = []
     #Thêm vào stack vị trí đầu tiên
     stack.append([i1,j1,i2,j2,map])
     while (len(stack) != 0):
@@ -78,23 +78,94 @@ def dfs(i1,j1,i2,j2,map):
                 print(f"-->[{x1},{y1},{x2},{y2}]")
                 print("Success")
                 exit()
-    print(visited)
+    print("Not found")
+    exit()
+
+def bfs(i1,j1,i2,j2, map):
+    visited = []
+    queue = []
+    #Thêm vào queue vị trí bắt đầu
+    queue.append([i1,j1,i2,j2,map])
+    while (len(queue) != 0):
+        item_pop = queue.pop(0)
+        visited.append(item_pop[:4])
+        i1,j1,i2,j2,map = item_pop
+        #Di chuyển lên (UP)
+        temp_map = map.copy()
+        x1,y1,x2,y2,new_map,valid = control.UP(i1,j1,i2,j2,temp_map)
+        if valid and (not check_visited([x1,y1,x2,y2], visited)):
+            queue.append([x1,y1,x2,y2,new_map])
+            if check_goal(x1,y1,x2,y2,new_map):
+                print(visited)
+                print(f"-->[{x1},{y1},{x2},{y2}]")
+                print("Success")
+                exit()
+        #Di chuyển xuống (DOWN)
+        temp_map = map.copy()
+        x1,y1,x2,y2,new_map,valid = control.DOWN(i1,j1,i2,j2,temp_map)
+        if valid and (not check_visited([x1,y1,x2,y2], visited)):
+            queue.append([x1,y1,x2,y2,new_map])
+            if check_goal(x1,y1,x2,y2,new_map):
+                print(visited)
+                print(f"-->[{x1},{y1},{x2},{y2}]")
+                print("Success")
+                exit()
+        #Di chuyển qua trái (LEFT)
+        temp_map = map.copy()
+        x1,y1,x2,y2,new_map,valid = control.LEFT(i1,j1,i2,j2,temp_map)
+        if valid and (not check_visited([x1,y1,x2,y2], visited)):
+            queue.append([x1,y1,x2,y2,new_map])
+            if check_goal(x1,y1,x2,y2,new_map):
+                print(visited)
+                print(f"-->[{x1},{y1},{x2},{y2}]")
+                print("Success")
+                exit()
+        #Di chuyển qua phải (RIGHT)
+        temp_map = map.copy()
+        x1,y1,x2,y2,new_map,valid = control.RIGHT(i1,j1,i2,j2,temp_map)
+        if valid and (not check_visited([x1,y1,x2,y2], visited)):
+            queue.append([x1,y1,x2,y2,new_map])
+            if check_goal(x1,y1,x2,y2,new_map):
+                print(visited)
+                print(f"-->[{x1},{y1},{x2},{y2}]")
+                print("Success")
+                exit()
     print("Not found")
     exit()
 
 
-
 if __name__ == "__main__":
-    map = np.matrix([
-        [2,2,2,0,0,0,0,0,0,0],
-        [2,2,2,2,2,2,0,0,0,0],
-        [2,2,2,2,2,2,2,2,2,0],
-        [0,2,2,2,2,2,2,2,2,2],
-        [0,0,0,0,0,2,2,12,2,2],
-        [0,0,0,0,0,0,2,2,2,0]
-    ])
+    # Map 1 //  initBlock = [1,1,1,1]
+    # map = np.matrix([
+    #     [2,2,2,0,0,0,0,0,0,0],
+    #     [2,2,2,2,2,2,0,0,0,0],
+    #     [2,2,2,2,2,2,2,2,2,0],
+    #     [0,2,2,2,2,2,2,2,2,2],
+    #     [0,0,0,0,0,2,2,12,2,2],
+    #     [0,0,0,0,0,0,2,2,2,0]
+    # ])
     
-    initBlock = [1,1,1,1]
+    # Map 2
+    # map = np.matrix([
+    #     [0,0,0,0,0,0,2,2,2,2,0,0,2,2,2],
+    #     [2,2,2,2,0,0,2,2,2,2,0,0,2,12,2],
+    #     [2,2,2,2,0,0,2,2,2,2,0,0,2,2,2],
+    #     [2,2,2,2,0,0,2,2,2,2,0,0,2,2,2],
+    #     [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+    #     [2,2,2,2,0,0,2,2,2,2,0,0,0,0,0]
+    # ])
+
+    # Map 3 //  initBlock = [3,1,3,1]
+    map = np.matrix([
+        [0,0,0,0,0,0,2,2,2,2,2,2,2,0,0],
+        [2,2,2,2,0,0,2,2,2,0,0,2,2,0,0],
+        [2,2,2,2,2,2,2,2,2,0,0,2,2,2,2],
+        [2,2,2,2,0,0,0,0,0,0,0,2,2,12,2],
+        [2,2,2,2,0,0,0,0,0,0,0,2,2,2,2],
+        [0,0,0,0,0,0,0,0,0,0,0,0,2,2,2]
+    ])
+
+    initBlock = [3,1,3,1]
     i1 = initBlock[0]
     j1 = initBlock[1]
     i2 = initBlock[2]
